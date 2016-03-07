@@ -1,0 +1,155 @@
+PROJECT( protobuf )
+
+ADD_DEFINITIONS(-D_SILENCE_STDEXT_HASH_DEPRECATION_WARNINGS)
+
+SET(SRC_BODY
+	src/google/protobuf/stubs/atomicops_internals_x86_msvc.cc
+	src/google/protobuf/io/coded_stream.cc
+	src/google/protobuf/stubs/common.cc
+	src/google/protobuf/extension_set.cc
+	src/google/protobuf/generated_message_util.cc
+	src/google/protobuf/message_lite.cc
+	src/google/protobuf/stubs/once.cc
+	src/google/protobuf/repeated_field.cc
+	src/google/protobuf/stubs/stringprintf.cc
+	src/google/protobuf/wire_format_lite.cc
+	src/google/protobuf/io/zero_copy_stream.cc
+	src/google/protobuf/io/zero_copy_stream_impl_lite.cc
+)
+
+DIRAC_SourceGroup("Source Files" "${SRC_BODY}" "src/google/protobuf")
+
+SET(SRC_HEADERS	
+	src/google/protobuf/stubs/atomicops.h
+	src/google/protobuf/stubs/atomicops_internals_x86_msvc.h
+	src/google/protobuf/io/coded_stream.h
+	src/google/protobuf/io/coded_stream_inl.h
+	src/google/protobuf/stubs/common.h
+	src/google/protobuf/extension_set.h
+	src/google/protobuf/generated_message_util.h
+	src/google/protobuf/stubs/hash.h
+	src/google/protobuf/stubs/map_util.h
+	src/google/protobuf/stubs/once.h
+	src/google/protobuf/stubs/platform_macros.h
+	src/google/protobuf/repeated_field.h
+	src/google/protobuf/stubs/stl_util.h
+	src/google/protobuf/stubs/stringprintf.h
+	src/google/protobuf/stubs/substitute.h
+	src/google/protobuf/stubs/template_util.h
+	src/google/protobuf/stubs/type_traits.h
+	src/google/protobuf/wire_format_lite.h
+	src/google/protobuf/wire_format_lite_inl.h
+	src/google/protobuf/io/zero_copy_stream.h
+	src/google/protobuf/io/zero_copy_stream_impl_lite.h
+)
+
+DIRAC_SourceGroup("Header Files" "${SRC_HEADERS}" "src/google/protobuf")
+
+#############################################################################################
+
+SET(SRC_BODY
+	src/google/protobuf/stubs/atomicops_internals_x86_msvc.cc
+	src/google/protobuf/io/coded_stream.cc
+	src/google/protobuf/stubs/common.cc
+	src/google/protobuf/descriptor.cc
+	src/google/protobuf/descriptor.pb.cc
+	src/google/protobuf/descriptor_database.cc
+	src/google/protobuf/dynamic_message.cc
+	src/google/protobuf/extension_set.cc
+	src/google/protobuf/extension_set_heavy.cc
+	src/google/protobuf/generated_message_reflection.cc
+	src/google/protobuf/generated_message_util.cc
+	src/google/protobuf/io/gzip_stream.cc
+	src/google/protobuf/compiler/importer.cc
+	src/google/protobuf/message.cc
+	src/google/protobuf/message_lite.cc
+	src/google/protobuf/stubs/once.cc
+	src/google/protobuf/compiler/parser.cc
+	src/google/protobuf/io/printer.cc
+	src/google/protobuf/reflection_ops.cc
+	src/google/protobuf/repeated_field.cc
+	src/google/protobuf/service.cc
+	src/google/protobuf/stubs/stringprintf.cc
+	src/google/protobuf/io/strtod.cc
+	src/google/protobuf/stubs/structurally_valid.cc
+	src/google/protobuf/stubs/strutil.cc
+	src/google/protobuf/stubs/substitute.cc
+	src/google/protobuf/text_format.cc
+	src/google/protobuf/io/tokenizer.cc
+	src/google/protobuf/unknown_field_set.cc
+	src/google/protobuf/wire_format.cc
+	src/google/protobuf/wire_format_lite.cc
+	src/google/protobuf/io/zero_copy_stream.cc
+	src/google/protobuf/io/zero_copy_stream_impl.cc
+	src/google/protobuf/io/zero_copy_stream_impl_lite.cc
+)
+
+DIRAC_SourceGroup("Source Files" "${SRC_BODY}" "src/google/protobuf")
+
+SET(SRC_HEADERS	
+	src/google/protobuf/stubs/atomicops.h
+	src/google/protobuf/stubs/atomicops_internals_x86_msvc.h
+	src/google/protobuf/io/coded_stream.h
+	src/google/protobuf/io/coded_stream_inl.h
+	src/google/protobuf/stubs/common.h
+	src/google/protobuf/extension_set.h
+	src/google/protobuf/generated_message_util.h
+	src/google/protobuf/stubs/hash.h
+	src/google/protobuf/stubs/map_util.h
+	src/google/protobuf/stubs/once.h
+	src/google/protobuf/stubs/platform_macros.h
+	src/google/protobuf/repeated_field.h
+	src/google/protobuf/stubs/stl_util.h
+	src/google/protobuf/stubs/stringprintf.h
+	src/google/protobuf/stubs/substitute.h
+	src/google/protobuf/stubs/template_util.h
+	src/google/protobuf/stubs/type_traits.h
+	src/google/protobuf/wire_format_lite.h
+	src/google/protobuf/wire_format_lite_inl.h
+	src/google/protobuf/io/zero_copy_stream.h
+	src/google/protobuf/io/zero_copy_stream_impl_lite.h
+)
+
+DIRAC_SourceGroup("Header Files" "${SRC_HEADERS}" "src/google/protobuf")
+
+IF(ANDROID)
+	ADD_LIBRARY( protobuf STATIC IMPORTED )
+	SET_TARGET_PROPERTIES(
+		protobuf
+		PROPERTIES
+		IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/prebuilt/libprotobuf.a"
+	)
+
+ELSE()
+	ADD_LIBRARY( protobuf STATIC
+		${SRC_BODY}
+		${SRC_HEADERS}
+	)
+
+	IF(APPLE OR IOS)
+		TARGET_INCLUDE_DIRECTORIES(
+			protobuf
+			PRIVATE
+			config/apple
+		)
+	ELSEIF(MSVC)
+		TARGET_INCLUDE_DIRECTORIES(
+			protobuf
+			PRIVATE
+			vsprojects
+		)
+	ENDIF()
+
+	TARGET_INCLUDE_DIRECTORIES(
+		protobuf
+		PUBLIC
+		src
+	)
+
+ENDIF()
+
+SET_TARGET_PROPERTIES(
+	protobuf
+	PROPERTIES
+	FOLDER "Libraries/External"
+)
