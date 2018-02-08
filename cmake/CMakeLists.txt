@@ -14,6 +14,8 @@ project(protobuf C CXX)
 # Options
 option(protobuf_BUILD_TESTS "Build tests" ON)
 option(protobuf_BUILD_EXAMPLES "Build examples" OFF)
+option(protobuf_BUILD_INSTALL "Build for installation" ON)
+
 if (BUILD_SHARED_LIBS)
   set(protobuf_BUILD_SHARED_LIBS_DEFAULT ON)
 else (BUILD_SHARED_LIBS)
@@ -172,7 +174,9 @@ if (protobuf_BUILD_TESTS)
   include(tests.cmake)
 endif (protobuf_BUILD_TESTS)
 
-include(install.cmake)
+if (protobuf_BUILD_INSTALL)
+  include(install.cmake)
+endif (protobuf_BUILD_INSTALL)
 
 if (protobuf_BUILD_EXAMPLES)
   include(examples.cmake)
