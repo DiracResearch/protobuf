@@ -207,11 +207,34 @@ set(js_well_known_types_sources
   ${protobuf_source_dir}/src/google/protobuf/compiler/js/well_known_types/struct.js
   ${protobuf_source_dir}/src/google/protobuf/compiler/js/well_known_types/timestamp.js
 )
-add_executable(js_embed ${protobuf_source_dir}/src/google/protobuf/compiler/js/embed.cc)
+
+if (CMAKE_CROSSCOMPILING)
+    if (NOT PROTOBUF_JS_EMBED)
+        set(workdir ${CMAKE_CURRENT_BINARY_DIR}/host_bin)
+        execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory "${workdir}")
+        message(STATUS "Protobuf: building 'js_embed' for ${CMAKE_HOST_SYSTEM_PROCESSOR}...")
+
+        # Generate makefiles, making sure CC and CXX env vars are unset (so that default system compiler is used)
+        execute_process(COMMAND ${CMAKE_COMMAND} -E env --unset=CC --unset=CXX
+                                ${CMAKE_COMMAND} -Dprotobuf_BUILD_INSTALL=OFF -Dprotobuf_BUILD_TESTS=OFF
+                                ${CMAKE_CURRENT_SOURCE_DIR}
+                        WORKING_DIRECTORY "${workdir}")
+
+        # Build target
+        execute_process(COMMAND ${CMAKE_COMMAND} --build . --target js_embed --config Release -- -j4
+                        WORKING_DIRECTORY "${workdir}")
+
+        set(PROTOBUF_JS_EMBED "${workdir}/js_embed" CACHE FILEPATH "" FORCE)
+    endif()
+else()
+    add_executable(js_embed ${protobuf_source_dir}/src/google/protobuf/compiler/js/embed.cc)
+    set(PROTOBUF_JS_EMBED $<TARGET_FILE:js_embed>)
+endif()
+
 add_custom_command(
   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/well_known_types_embed.cc
-  DEPENDS js_embed ${js_well_known_types_sources}
-  COMMAND js_embed ${js_well_known_types_sources} > ${CMAKE_CURRENT_BINARY_DIR}/well_known_types_embed.cc
+  DEPENDS ${js_well_known_types_sources}
+  COMMAND ${PROTOBUF_JS_EMBED} ${js_well_known_types_sources} > ${CMAKE_CURRENT_BINARY_DIR}/well_known_types_embed.cc
 )
 
 add_library(libprotoc ${protobuf_SHARED_OR_STATIC}
